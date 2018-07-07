@@ -36,8 +36,12 @@ if [[ $1 =~ ^[1-2]{1}[0-9]{3}-[0-9]{2}$ ]]; then
   url="https://travel.state.gov/content/travel/en/legal/visa-law0/visa-bulletin/${year}/visa-bulletin-for-${month}-${yyyy}.html"
   echo "URL to check:" $url
   http_status=$(curl -I -s ${url} | grep HTTP |  awk '{print $2}')
-  echo $http_status
-  while [  $http_status -eq 404 ]; do
+  if [ -z "$http_status" ]; then
+	  echo "No internet connection."
+	  exit 0
+  fi
+  echo "HTTP Status:" $http_status
+  while [ $http_status -eq 404 ]; do
     http_status=$(curl -I -s ${url} | grep HTTP |  awk '{print $2}')
     echo "Not released yet. Please wait. New check in 60 seconds..."
     sleep 60
